@@ -19,6 +19,7 @@ import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -27,6 +28,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -78,7 +80,7 @@ fun IntensityList(onClick:(Float) -> Unit){
         Icons.Filled.KeyboardArrowDown
 
     Column{
-        OutlinedTextField(
+   OutlinedTextField(
             readOnly = true,
             value = selectedText,
             onValueChange = {selectedText = it},
@@ -89,39 +91,48 @@ fun IntensityList(onClick:(Float) -> Unit){
                 },
             label = {Text("Select intensity")},
             trailingIcon = {
-                Icon(icon,"contentDescription",
+                Icon(icon, "contentDescription",
                     Modifier.clickable { expanded = !expanded })
             }
-        )
-        DropdownMenu(
+    )
+    DropdownMenu(
             expanded = expanded,
             onDismissRequest = {expanded = false},
             modifier = Modifier
-                .width(with(LocalDensity.current){textFieldSize.width.toDp()})
-        ){
+                .width(with(LocalDensity.current){textFieldSize.width.toDp()}),
+    ){
             items.forEach{label->
+                DropdownMenuItem(
+                    onClick = {
+                        selectedText = label
 
-            }
+                        var intensity: Float = when (label) {
+                            "Light" -> 1.3f
+                            "Usual" -> 1.5f
+                            "Moderate" -> 1.7f
+                            "Hard" -> 2.0f
+                            "Very hard" -> 2.2f
+                            else -> 0.0f
 
+                        }
+                        onClick(intensity)
+                        expanded = false
+                    },
+                    text = {label}
+                )
         }
-
-
-
     }
 }
-
-
-
-
+}
 
 
 @Composable
 fun CalorieScreen() {
     var weightInput by remember {mutableStateOf("")}
-    var weight = weightInput.toIntOrNull() ?: 0
+    val weight = weightInput.toIntOrNull() ?: 0
     var male by remember {mutableStateOf(true)}
-    var intensity by remember {mutableStateOf(1.3f)}
-    var result by remember {mutableStateOf(0)}
+    var intensity by remember { mutableStateOf(1.3f) }
+    var result by remember { mutableIntStateOf(0) }
 
     Column(
         modifier = Modifier.padding(8.dp),
